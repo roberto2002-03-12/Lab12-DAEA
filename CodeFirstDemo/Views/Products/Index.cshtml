@@ -1,0 +1,83 @@
+﻿@model IEnumerable<CodeFirstDemo.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ProductID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ProductID })
+            </td>
+        </tr>
+    }
+
+</table>
+
+<input type="text" id="txtProducts" />
+<input type="button" value="Get Product" id="btnGetProducts">
+<input type="button" value="Clean" id="btnClean">
+<br />
+<table id="tblProducts" class="table table-bordered table-striped table-responsive table-hover">
+    <thead>
+        <tr>
+            <th align="left" class="productth">ID</th>
+            <th align="left" class="productth">Name</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#btnGetProducts").click((function () {
+                var course = $("#txtProducts").val();
+                $("#tblProducts tbody tr").remove();
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("getProducts")',
+                    dataType: 'json',
+                    data: { name: course },
+                        success: function (data) {
+                        $.each(data, function (i, item) {
+                            var rows = "<tr>"
+                                + "<td class='prtoducttd'>" + item.ProductID + "</td>"
+                                + "<td class='prtoducttd'>" + item.Name + "</td>"
+                            + "</tr>";
+                            $('#tblProducts tbody').append(rows);
+                        });
+                    },
+                    error: function (ex) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }));
+        });
+
+    </script>
+}
